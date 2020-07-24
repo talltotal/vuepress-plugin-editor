@@ -1,0 +1,26 @@
+{
+  "name": "@talltotal/vuepress-plugin-editor",
+  "version": "0.0.1",
+  "description": "editor plugin for vuepress",
+  "main": "index.js",
+  "author": "talltotal",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/talltotal/vuepress-plugin-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/talltotal/vuepress-plugin-editor/issues"
+  },
+  "homepage": "https://talltotal.github.io/vuepress-plugin-editor/",
+  "keywords": [
+    "rich editor",
+    "editor",
+    "vue",
+    "vuepress",
+    "vuepress-plugin"
+  ],
+  "devDependencies": {
+    "@vuepress/core": "^1.2.0"
+  }
+}
