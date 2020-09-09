@@ -1,7 +1,6 @@
 # [@talltotal/vuepress-plugin-editor](https://talltotal.github.io/vuepress-plugin-editor/)
 
-在文档中做一些简单的富文本操作，
-是本人使用频率最高的组件了。
+在文档中做一些简单的富文本操作。
 
 
 ## install
@@ -22,6 +21,8 @@ module.exports = {
 直接在文档中以组件元素的形式使用，接收两个参数：
 - `name` 模块的名字，需全站唯一
 - `type` ‘light’或‘dark’，主题色
+- `hideControls` 隐藏操作区
+- `minArea` 在组件内划分横向的区域数
 
 ```md
 <editor name="file-name" />
