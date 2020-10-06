@@ -1,6 +1,6 @@
 {
   "name": "@talltotal/vuepress-plugin-editor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "editor plugin for vuepress",
   "main": "index.js",
   "author": "talltotal",
