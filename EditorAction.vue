@@ -1,27 +1,20 @@
 <template>
-  <div>
-    <div
-      v-if="isShow"
-      :class="{[$style.fix]: isFix}"
-    >
-      <label
-        v-for="act in action"
-        :key="act[1]"
-        :class="[$style.label]"
-        :style="act[2]"
-        :title="act[0]"
-        @mousedown.prevent.stop="handle(act[1])"
-        v-html="act[3] || ''"
-      />
-      <slot />
-    </div>
+  <div
+    :class="{[$style.fix]: isFix}">
+    <label
+      v-for="act in action"
+      :key="act[1]"
+      :class="[$style.label]"
+      :style="act[2]"
+      :title="act[0]"
+      @mousedown.prevent.stop="handle(act[1])"
+      v-html="act[3] || ''"
+    />
+    <slot />
   </div>
 </template>
 
 <script>
-const elList = []
-let activeComp = 0
-
 export const handle = (type) => {
   const colors = {
     title: 'rgb(0, 32, 96)',
@@ -44,8 +37,21 @@ export const handle = (type) => {
     italic: 'italic',
     tab: ['insertText', '    '],
     tabBack: () => null,
-    link: ['createLink', window.getSelection().toString()],
-    unlink: 'unlink',
+    link: () => {
+      return ['createLink', window.getSelection().toString()]
+      // const txt = window.getSelection().toString()
+      // const match = txt.match(/\[([^\]]+)\]\(([^)]+)\)/)
+      // const at = match && match[1] || txt
+      // const hr = match && match[2] || txt
+      // const newHtml = (atxt,href) => {
+      //   return `<a herf="${href}" title="${href}">${atxt}</a>`
+      // }
+      // document.execCommand('insertHTML', false, newHtml(at, hr))
+    },
+    unlink: () => {
+      return 'unlink'
+      // document.execCommand('insertText', false, newHtml(at, hr))
+    },
   }
   let action = actions[type] || ['foreColor', colors[type]]
 
@@ -65,15 +71,14 @@ export const handle = (type) => {
 
 export default {
   props: {
-    contentEl: {
-      default: null,
-    },
+    isFix: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     const editorIcon = this.$style.editorIcon
     return {
-      isFix: false,
-      isShow: false,
       action: [
         // [title, key, innerStyle, innerHTML]
         ['fontSize++', 'and', '', 'A<sup>+</sup>'],
@@ -94,49 +99,6 @@ export default {
         ['unlink', 'unlink', '', `<svg class="${editorIcon}" aria-hidden="true"><use xlink:href="#icon-unlink"></use></svg>`],
       ],
     }
-  },
-  mounted () {
-    /**
-     * 在新页面mount之后，旧页面才开始destroy
-     * 计数从 nextTick 开始
-     */
-    this.$nextTick(() => {
-      elList.push(this.contentEl)
-      activeComp += 1
-      if (activeComp === 1) {
-        this.isShow = true
-      }
-
-      if (!window.__EDITOR) {
-        const vm = this
-        window.__EDITOR = () => {
-          const { scrollY } = window
-          const firstEl = elList[0]
-          const lastEl = elList[elList.length - 1]
-
-          if (!firstEl) return
-          if (!lastEl) return
-
-          const min = firstEl.offsetTop - 100
-          const max = lastEl.offsetTop + lastEl.clientHeight - 100
-
-          vm.isFix = scrollY > min && scrollY < max
-        }
-        /** 对一开始的页面位置进行判断 */
-        window.__EDITOR()
-        window.addEventListener('scroll', window.__EDITOR)
-      }
-    })
-  },
-  beforeDestroy () {
-    activeComp -= 1
-    this.$nextTick(() => {
-      elList.pop()
-      if (activeComp === 0) {
-        window.__EDITOR = null
-        window.removeEventListener('scroll', window.__EDITOR)
-      }
-    })
   },
   methods: {
     handle (...args) {

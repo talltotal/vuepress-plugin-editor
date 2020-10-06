@@ -8,10 +8,13 @@
       <symbol id="icon-download" viewBox="0 0 1024 1024"><path d="M633.341091 671.637814c-11.326976-11.328-29.694299-11.328-41.022299 0l-44.363394 45.106314 0-237.407038c0-16.020882-12.986779-29.007661-29.006637-29.007661l-8.867972 0c-16.020882 0-29.007661 12.985756-29.007661 29.007661l0 241.248529-48.14144-48.947805c-11.328-11.328-29.694299-11.328-41.022299 0l-6.27082 6.27082c-11.328 11.326976-11.329023 29.694299 0 41.022299L490.889705 825.944202c5.975085 5.976108 13.909801 8.79634 21.736047 8.466835 7.825222 0.328481 15.759939-2.491751 21.735024-8.466835l105.251136-107.013269c11.328-11.328 11.328-29.695323 0-41.022299L633.341091 671.637814z"></path><path d="M916.318 403.171386c-20.911262-24.651446-48.196699-44.821835-79.002308-55.130621-6.601348-74.843592-38.726-142.075833-88.228437-192.724373C693.638385 99.288331 616.835162 64.328098 533.007965 64.328098c-61.839417 0-119.489418 18.824741-167.898965 51.543933-44.008306 29.134551-80.095199 69.474304-104.071264 117.881804-52.156894 8.515954-99.245352 34.063817-133.572158 71.257927-39.607066 42.131563-63.371306 99.05604-63.371306 161.357991 0 64.992223 25.965371 124.155694 68.212568 166.737512l-0.652869 0c41.905412 42.911322 99.357915 69.322855 163.399487 69.466118l0-70.370721c-44.683688-0.14224-85.406159-18.486026-114.549919-48.400337-29.714765-30.029944-47.756677-71.267137-47.756677-117.433596 0-43.924395 17.162892-83.816964 44.447305-113.3987 27.28646-29.582759 65.360614-48.854685 107.380636-51.096748 13.202697-0.448208 25.313525-8.516977 30.80561-21.515013 18.482957-43.917232 49.288566-80.670298 87.803765-106.667392 36.738739-24.650423 81.627089-39.442314 129.823787-39.442314 65.131393 0 124.543527 26.89351 167.44257 70.370721 42.687218 43.924395 69.532633 103.978143 69.532633 170.763199 0 16.5837 11.44261 31.374568 28.164456 34.512025 26.406416 4.929266 49.28959 18.376533 66.013483 38.098713 15.402805 19.721157 25.312502 44.820811 25.312502 72.161506 0 31.374568-12.110829 58.716286-32.354895 79.334883-19.363 20.171412-46.647413 32.720216-76.784804 32.720216l-0.669242 0-11.195993 0 0 70.370721 11.195993 0 0.881067 0c48.847521-0.896416 93.085048-21.512966 125.422548-53.338812 32.125675-33.167401 52.369741-78.43642 52.369741-129.085984C958.339046 475.78417 942.056198 434.994162 916.318 403.171386z"></path><path d="M894.954437 928.496879c0 16.019859-12.986779 29.007661-29.007661 29.007661L156.013775 957.50454c-16.020882 0-29.007661-12.986779-29.007661-29.007661l0-6.943133c0-16.019859 12.986779-29.007661 29.007661-29.007661l709.934025 0c16.019859 0 29.007661 12.986779 29.007661 29.007661L894.95546 928.496879z"></path></symbol>
     </svg>
     <div v-if="!hideControls" :class="$style.demo">
-      <EditorAction
-        :content-el="contentEl"
-        :tes="1"
-      />
+      <div>
+        <EditorAction
+          v-show="isShowAction"
+          :isFix="isFixAction"
+          :tes="1"
+        />
+      </div>
       <div>
         <button @click="outLink">
           <OutboundLink />
@@ -33,6 +36,9 @@
           </svg>
         </button>
       </div>
+    </div>
+    <div :class="{[$style.uploadToast]: true, [$style.show]: showUploadInfo}">
+      <label>Uploaded!</label>
     </div>
     <!--
       编辑面板，快捷键：
@@ -77,12 +83,14 @@
  * - 预览模式：预览
  */
 import EditorAction, { handle } from './EditorAction'
+import ActionMixin from './actionMixin'
 
 export default {
   name: 'Editor',
   components: {
     EditorAction,
   },
+  mixins: [ActionMixin],
   props: {
     name: {
       type: String,
@@ -106,7 +114,10 @@ export default {
   },
   data () {
     return {
+      showUploadInfo: false,
       contentEl: null,
+      isFixAction: false,
+      isShowAction: false
     }
   },
   computed: {
@@ -185,6 +196,13 @@ export default {
         },
         method: 'POST',
       })
+      this.showUploadToast()
+    },
+    showUploadToast () {
+      this.showUploadInfo = true
+      setTimeout(() => {
+        this.showUploadInfo = false
+      }, 1000);
     },
     saveLocal () {
       if (!this.$refs.content) {
@@ -199,37 +217,69 @@ export default {
       const areaStyle = 'flex:1; outline:none;'
       const areaStart = `<div class="${areaClassName}" style="${areaStyle}" contenteditable>`
       const areaEnd = `</div>`
+      /**
+       * 处理分区
+       */
       if (minArea > 1) {
         const { childNodes = [] } = this.$refs.content
+        /** 是否子节点都是区域节点 */
         let isInArea = true
+        /** 剩余应有区域数 */
         let lastNodeNum = minArea
+        /** 重新拼接html */
         let outerHTML = ''
-        let innerHTML = ''
 
+        /**
+         * 遍历子节点
+         */
         for (let node of childNodes) {
-          if (node.className !== areaClassName) {
+          /**
+           * 子节点不是约定的节点，创建一个区域节点，将剩余的内容都放进去
+           * 记一个节点
+           */
+          if (isInArea && node.className !== areaClassName) {
             isInArea = false
             lastNodeNum -= 1
             outerHTML += areaStart
           }
+          /**
+           * 正常子节点是区域节点，记一个节点
+           */
           if (isInArea) {
             lastNodeNum -= 1
           }
-          outerHTML += node.outerHTML
+          /**
+           * 删除超出数量且内容为空的节点
+           */
+          if (!(isInArea && lastNodeNum < 0 && (!node.innerHTML || node.innerHTML == '<br>'))) {
+            outerHTML += node.outerHTML
+          }
         }
 
-        if (isInArea && !lastNodeNum) {
+        /**
+         * 无异常，不处理
+         */
+        if (isInArea && lastNodeNum == 0) {
           return
         }
 
+        /**
+         * 有新创建的节点，增加节点的关闭内容
+         */
         if (!isInArea) {
           outerHTML += areaEnd
         }
 
+        /**
+         * 节点数不足数的，再补充空的节点
+         */
         while (lastNodeNum-- > 0) {
           outerHTML += areaStart + areaEnd
         }
 
+        /**
+         * 更新html
+         */
         this.$refs.content.innerHTML = outerHTML
       }
     }
@@ -238,6 +288,29 @@ export default {
 </script>
 
 <style module lang="stylus">
+.uploadToast
+    height 0
+    text-align right
+    opacity 0
+    transition all linear 0.3s
+    padding-right 1em
+    transform translateY(-1em)
+
+    position sticky
+    top 60px
+
+    &.show
+        opacity 1
+        transform translateY(0.5em)
+
+    label
+      background-color #ecf5ff
+      color #409eff
+      border 1px solid #d9ecff
+      border-radius 4px
+      padding 5px 10px
+      font-size 12px
+
 .demo
     margin-top 1em
     margin-bottom 1em
