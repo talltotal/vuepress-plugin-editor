@@ -1,6 +1,6 @@
 # [@talltotal/vuepress-plugin-editor](https://talltotal.github.io/vuepress-plugin-editor/)
 
-在文档中做一些简单的富文本操作。
+在VuePress文档中做一些简单的富文本操作。
 
 
 ## install

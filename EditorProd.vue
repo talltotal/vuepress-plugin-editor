@@ -1,68 +1,68 @@
 <template>
-  <div>
-    <div
-      ref="content"
-      :class="[$style.content, $style[type]]"
-      @click.left.exact="openLink"
-      @click.left.meta.exact="openLink"
-    />
-  </div>
+    <div>
+        <div
+            ref="content"
+            :class="[$style.content, $style[type]]"
+            @click.left.exact="openLink"
+            @click.left.meta.exact="openLink"
+        />
+    </div>
 </template>
 
 <script>
 export default {
-  name: 'Editor',
-  props: {
-    name: {
-      type: String,
-      required: true,
+    name: 'Editor',
+    props: {
+        name: {
+            type: String,
+            required: true,
+        },
+        type: {
+            type: String,
+            default: 'light',
+            validator (val) {
+                return ['light', 'dark'].includes(val)
+            },
+        },
     },
-    type: {
-      type: String,
-      default: 'light',
-      validator (val) {
-        return ['light', 'dark'].includes(val)
-      },
-    },
-  },
-  data () {
-    return {
-      contentEl: null,
-    }
-  },
-  computed: {
-    basePath () {
-      return `${this.$site.base}editorData/${this.name}.htm`
-    },
-  },  
-  created () {
-    if (!this.name) {
-      return new Error('name is required for EDITOR!')
-    }
-  },
-  mounted () {
-    this.getServer()
-  },
-  methods: {
-    openLink ({ target }) {
-      if (target && target.tagName === 'A' && target.href) {
-        window.open(target.href, '_blank')
-      }
-    },
-    getServer () {
-      window.fetch(this.basePath).then(res => {
-        if (res.headers.get('Cache-Control')) {
-          return res.text()
-        } else {
-          return Promise.resolve('')
+    data () {
+        return {
+            contentEl: null,
         }
-      }).then(txt => {
-        const el = this.$refs.content
-        el.innerHTML = this.data = txt
-        window.localStorage.setItem(`COMP_EDITOR_${this.name}`, txt)
-      })
-    }
-  },
+    },
+    computed: {
+        basePath () {
+            return `${this.$site.base}editorData/${this.name}.htm`
+        },
+    },  
+    created () {
+        if (!this.name) {
+            return new Error('name is required for EDITOR!')
+        }
+    },
+    mounted () {
+        this.getServer()
+    },
+    methods: {
+        openLink ({ target }) {
+            if (target && target.tagName === 'A' && target.href) {
+                window.open(target.href, '_blank')
+            }
+        },
+        getServer () {
+            window.fetch(this.basePath).then(res => {
+                if (res.headers.get('Cache-Control')) {
+                    return res.text()
+                } else {
+                    return Promise.resolve('')
+                }
+            }).then(txt => {
+                const el = this.$refs.content
+                el.innerHTML = this.data = txt
+                window.localStorage.setItem(`COMP_EDITOR_${this.name}`, txt)
+            })
+        }
+    },
 }
 </script>
 
@@ -87,5 +87,5 @@ export default {
         cursor pointer
 
     a
-      font-weight inherit
+        font-weight inherit
 </style>

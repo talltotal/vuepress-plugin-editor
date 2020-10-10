@@ -5,6 +5,11 @@
   "main": "index.js",
   "author": "talltotal",
   "license": "MIT",
+  "scripts": {
+    "test": "vuepress build ./test --dest ./docs",
+    "lint": "./node_modules/.bin/eslint *.{js,vue} --fix",
+    "jsdoc": "jsdoc -d ./out -c ./jsdoc.conf.json ./index.js ./README.md"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/talltotal/vuepress-plugin-editor.git"
@@ -21,6 +26,8 @@
     "vuepress-plugin"
   ],
   "devDependencies": {
-    "@vuepress/core": "^1.2.0"
+    "eslint": "^7.11.0",
+    "eslint-plugin-vue": "^7.0.1",
+    "vuepress": "^1.6.0"
   }
 }
