@@ -25,6 +25,7 @@
                 />
             </div>
             <div>
+                <slot name="btns" />
                 <button @click="outLink">
                     <OutboundLink />
                 </button>
@@ -46,8 +47,8 @@
                 </button>
             </div>
         </div>
-        <div :class="{[$style.uploadToast]: true, [$style.show]: showUploadInfo}">
-            <label>Uploaded!</label>
+        <div :class="{[$style.toast]: true, [$style.show]: showInfo}">
+            <label>{{ infoTxt }}</label>
         </div>
         <!--
             编辑面板，快捷键：
@@ -119,7 +120,8 @@ export default {
     },
     data () {
         return {
-            showUploadInfo: false,
+            showInfo: false,
+            infoTxt: '',
             contentEl: null,
             isFixAction: false,
             isShowAction: false
@@ -193,20 +195,22 @@ export default {
                 name: this.name,
                 data: storageData || tempData,
             }
-            window.fetch('/api/updateEditor', {
+            return window.fetch('/api/updateEditor', {
                 body: JSON.stringify(data),
                 headers: {
                     'Access-Control-Allow-Method': 'POST',
                     'content-type': 'application/json',
                 },
                 method: 'POST',
+            }).then(() => {
+                this.showToast('Uploaded!')
             })
-            this.showUploadToast()
         },
-        showUploadToast () {
-            this.showUploadInfo = true
+        showToast (txt) {
+            this.showInfo = true
+            this.infoTxt = txt
             setTimeout(() => {
-                this.showUploadInfo = false
+                this.showInfo = false
             }, 1000);
         },
         saveLocal () {
@@ -293,7 +297,7 @@ export default {
 </script>
 
 <style module lang="stylus">
-.uploadToast
+.toast
     height 0
     text-align right
     opacity 0

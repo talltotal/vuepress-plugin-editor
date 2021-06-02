@@ -1,6 +1,6 @@
 {
   "name": "@talltotal/vuepress-plugin-editor",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "editor plugin for vuepress",
   "main": "index.js",
   "author": "talltotal",
@@ -26,8 +26,8 @@
     "vuepress-plugin"
   ],
   "devDependencies": {
-    "eslint": "^7.11.0",
-    "eslint-plugin-vue": "^7.0.1",
-    "vuepress": "^1.6.0"
+    "eslint": "^7.27.0",
+    "eslint-plugin-vue": "^7.10.0",
+    "vuepress": "^1.8.2"
   }
 }
