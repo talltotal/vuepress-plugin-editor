@@ -22,7 +22,7 @@ function initDir (dirPath) {
 
 /**
  * vuepress 插件函数
- * @param {*} options 传给插件的配置参数，目前无配置项
+ * @param {*} options 传给插件的配置参数, { editableInProd: false }
  * @param {Context} ctx 编译上下文，[点击查看详细说明](https://www.vuepress.cn/plugin/context-api.html#ctx-isprod)
  * @returns {Object} 返回给vuepress的配置，[点击查看详细说明](https://www.vuepress.cn/plugin/option-api.html)
  */
@@ -46,7 +46,7 @@ module.exports = (options, ctx) =>  {
              * - 开发模式：编辑/上传/下载
              * - 预览模式：预览
              */
-            ctx.isProd ? path.resolve(__dirname, 'enhanceAppFileProd.js') : path.resolve(__dirname, 'enhanceAppFile.js')
+            !options?.editableInProd && ctx.isProd ? path.resolve(__dirname, 'enhanceAppFileProd.js') : path.resolve(__dirname, 'enhanceAppFile.js')
         ],
     
         // 注册富文本上传接口

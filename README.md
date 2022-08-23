@@ -13,7 +13,9 @@ yarn add -D @talltotal/vuepress-plugin-editor
 ### 在 `config.js` 中引入
 ```js
 module.exports = {
-    plugins: ['@talltotal/vuepress-plugin-editor'] 
+    plugins: [
+        ['@talltotal/vuepress-plugin-editor', { editableInProd: false }]
+    ]
 }
 ```
 
