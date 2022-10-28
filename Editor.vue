@@ -202,8 +202,12 @@ export default {
                     'content-type': 'application/json',
                 },
                 method: 'POST',
-            }).then(() => {
-                this.showToast('Uploaded!')
+            }).then((res) => {
+                if (res.ok) {
+                    this.showToast('Uploaded!')
+                } else {
+                    this.showToast(res.statusText + ' :(')
+                }
             })
         },
         showToast (txt) {
